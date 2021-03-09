@@ -11,4 +11,4 @@ echo "This program will install the makeNewFile program into $INSTALL_DIR, using
 
 
 
-sudo cp makeNewFile.py /usr/local/bin/makeNewFile
+sudo cp makeNewFile.py $INSTALL_DIR/makeNewFile
