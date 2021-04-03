@@ -10,6 +10,7 @@ There are a few file types supported (and more to come):
 - C++ Source
 - C++ Header
 - NASM Assembly Source
+- Python Source
 
 NASM Assembly and C source contain no special things.
 C++ source contains C name guards, but commented out if you need them.
@@ -34,6 +35,8 @@ Here is a list of available license types you can insert (and more to come):
 
 - `mit`: The MIT License
 - `apache2`: The Apache 2.0 Licence
+- `gplv2`: The GNU Public License version 2
+- `gplv3`: The GNU Public License version 3
 
 IF YOU INSTALL THIS PROGRAM, you need to edit the first line, and set it to your Python 3 interpreter path.
 
