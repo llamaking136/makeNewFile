@@ -9,49 +9,95 @@ from json import load
 from os.path import exists
 from os import environ
 
-def build_licence_mit():
+def build_license_mit():
     return """
-// MIT License
-//
-// Copyright (c) {} {}
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+MIT License
+    
+Copyright (c) {} {}
+    
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+    
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+    
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 """
 
-def build_licence_apache2():
+def build_license_apache2():
     return """
-// Copyright {} {}
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+Copyright {} {}
+    
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    
+    http://www.apache.org/licenses/LICENSE-2.0
+    
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
-__version__ = "1.1.0"
+def build_license_gplv2():
+    return """
+Copyright (C) {} {}
+    
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+    
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+    
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+"""
+
+def build_license_gplv3():
+    return """
+Copyright (C) {}  {}
+    
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+    
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+    
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+
+def add_comments(text, comment):
+    result = []
+    for i in text.split("\n"):
+        if not i == "":
+            result.append(comment + i)
+        else:
+            result.append("")
+    return "\n".join(result)
+
+__version__ = "1.1.2"
 
 current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
@@ -62,12 +108,18 @@ else:
 
 def build_licence():
     if settings["licensetext"] == "mit":
-        return build_licence_mit()
+        return build_license_mit()
     elif settings["licensetext"] == "apache2":
-        return build_licence_apache2()
+        return build_license_apache2()
+    elif settings["licensetext"] == "gplv2":
+        return build_license_gplv2()
+    elif settings["licensetext"] == "gplv3":
+        return build_license_gplv3()
+    elif settings["licensetext"] == "none" or settings["licensetext"] == None:
+        return ""
     else:
         return """
-// Unknown License type
+Unknown License type
 """
 
 try:
@@ -97,9 +149,11 @@ for i in argv:
 del argv[0]
 
 for filename in argv:
+    isCHead  = False
     isHeader = False
     isCPP    = False
     isASM    = False
+    isPy     = False
 
     just_filename = filename[0:].split("/")[-1]
 
@@ -109,12 +163,16 @@ for filename in argv:
     filename = filename.upper()
     filename = filename.split("/")[-1]
 
-    if (filename.split(".")[-1].startswith("H")):
+    if filename.split(".")[-1] == "HPP":
+        isCHead = True
+    if (filename.split(".")[-1].startswith("H") and not isCHead):
         isHeader = True
     elif (filename.split(".")[-1] == "CPP"):
         isCPP = True
     elif "ASM" in filename.split(".")[-1]:
         isASM = True
+    elif "PY" in filename.split(".")[-1]:
+        isPy = True
 
     filename = filename.replace(".", "_")
     filename = filename.replace(" ", "_")
@@ -123,6 +181,35 @@ for filename in argv:
     for i in crap1:
         crap.append(i)
     filename = "".join(crap)
+    if (isCHead):
+        file.write(f"""//
+// {just_filename}
+//
+// created at {current_time}
+// written by {settings["author"]}
+//
+""")
+        if settings["licence"]:
+            file.write(add_comments(build_licence(), "// ").format(date.today().year, settings["author"]))
+        file.write("""
+
+#if !defined({})
+#define {}
+
+// #if defined(__cplusplus)
+extern "C" {{
+// #endif // __cplusplus
+
+// code...
+
+// #if defined(__cplusplus)
+}}
+// #endif // __cplusplus
+
+#endif // {}
+""".format(filename, filename, filename))
+        continue
+
     if (isHeader):
         file.write(f"""//
 // {just_filename}
@@ -132,7 +219,7 @@ for filename in argv:
 //
 """)
         if settings["licence"]:
-            file.write(build_licence().format(date.today().year, settings["author"]))
+            file.write(add_comments(build_licence(), "// ").format(date.today().year, settings["author"]))
         file.write(f"""
 
 #if !defined({filename})
@@ -150,23 +237,19 @@ for filename in argv:
 //
 """)
         if settings["licence"]:
-            file.write(build_licence().format(date.today().year, settings["author"]))
+            file.write(add_comments(build_licence(), "// ").format(date.today().year, settings["author"]))
         file.write("""
 
-/* // C guards for C++
-// Uncomment these lines if you need C compatibility
-#if defined(__cplusplus)
+// #if defined(__cplusplus)
 extern \"C\" {
-#endif // __cplusplus
-*/
+// #endif // __cplusplus
 
 // code...
 
-/* // Down here too
-#if defined(__cplusplus)
+// #if defined(__cplusplus)
 }
-#endif // __cplusplus
-*/""")
+// #endif // __cplusplus
+""")
     elif isASM:
         file.write(f"""; 
 ; {just_filename}
@@ -174,9 +257,26 @@ extern \"C\" {
 ; created at {current_time}
 ; written by {settings["author"]}
 ; 
-
+""")
+        if settings["licence"]:
+            file.write(add_comments(build_licence(), "; ").format(date.today().year, settings["author"]))
+        file.write("""
 
 ; code...
+""")
+    elif isPy:
+        file.write(f"""# 
+# {just_filename}
+# 
+# created at {current_time}
+# written by {settings["author"]}
+# 
+""")
+        if settings["licence"]:
+            file.write(add_comments(build_licence(), "# ").format(date.today().year, settings["author"]))
+        file.write("""
+
+# code...
 """)
     else:
         file.write(f"""//
@@ -187,7 +287,7 @@ extern \"C\" {
 //
 """)
         if settings["licence"]:
-            file.write(build_licence().format(date.today().year, settings["author"]))
+            file.write(add_comments(build_licence(), "// ").format(date.today().year, settings["author"]))
         file.write("""
 
 // code...""")
