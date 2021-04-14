@@ -88,6 +88,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+def build_license_llama1():
+    return """
+llamaking136's open source license
+Copyright (c) {} {}
+    
+This code is under the terms of contitions of llamaking136's open source license.
+If you wish to see the original license, view the file 'LICENSE' in the
+root folder or go to
+    
+    https://new-web.notyourgroup.repl.co/licenses/open-source-1.txt
+    
+If you don't follow to these terms of conditions, it will not be tolerated
+and will be handled by the owner of the repository.
+"""
+
 def add_comments(text, comment):
     result = []
     for i in text.split("\n"):
@@ -97,7 +112,7 @@ def add_comments(text, comment):
             result.append("")
     return "\n".join(result)
 
-__version__ = "1.1.2"
+__version__ = "1.1.4"
 
 current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
@@ -115,6 +130,8 @@ def build_licence():
         return build_license_gplv2()
     elif settings["licensetext"] == "gplv3":
         return build_license_gplv3()
+    elif settings["licensetext"] == "llama1":
+        return build_license_llama1()
     elif settings["licensetext"] == "none" or settings["licensetext"] == None:
         return ""
     else:
