@@ -37,6 +37,7 @@ Here is a list of available license types you can insert (and more to come):
 - `apache2`: The Apache 2.0 Licence
 - `gplv2`: The GNU Public License version 2
 - `gplv3`: The GNU Public License version 3
+- `llama1`: llamaking136's open source license, revision 1
 
 IF YOU INSTALL THIS PROGRAM, you need to edit the first line, and set it to your Python 3 interpreter path.
 
